@@ -1,0 +1,14 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'kubernetes'
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: keep
+        regex: service1|service2|service3|service4|service5
+  - job_name: 'service-endpoints'
+    static_configs:
+      - targets: ['service1:3001','service2:3002']
