@@ -1,0 +1,4 @@
+apiVersion: v2
+name: service4
+description: Helm chart for service4
+version: 0.1.0
