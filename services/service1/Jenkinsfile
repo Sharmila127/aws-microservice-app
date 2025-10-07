@@ -1,0 +1,31 @@
+pipeline {
+  agent any
+  environment {
+    AWS_ACCOUNT = '012345678901'
+    AWS_REGION = 'us-east-1'
+    ECR_REPO = "${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/service1"
+  }
+  stages {
+    stage('Checkout') { steps { checkout scm } }
+    stage('Build') { steps { sh 'npm install --production' } }
+    stage('Docker Build & Push') {
+      steps {
+        sh '''
+        IMAGE_TAG=$(git rev-parse --short HEAD)
+        docker build -t service1:${IMAGE_TAG} .
+        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${AWS_ACCOUNT}.dkr.ecr.$AWS_REGION.amazonaws.com
+        docker tag service1:${IMAGE_TAG} $ECR_REPO:${IMAGE_TAG}
+        docker push $ECR_REPO:${IMAGE_TAG}
+        '''
+      }
+    }
+    stage('Deploy to Staging') {
+      steps {
+        sh '''
+        IMAGE_TAG=$(git rev-parse --short HEAD)
+        helm upgrade --install service1 ./helm --set image.repository=$ECR_REPO --set image.tag=${IMAGE_TAG} --namespace staging --create-namespace
+        '''
+      }
+    }
+  }
+}
