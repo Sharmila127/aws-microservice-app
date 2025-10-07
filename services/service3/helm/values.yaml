@@ -1,0 +1,6 @@
+image:
+  repository: 012345678901.dkr.ecr.us-east-1.amazonaws.com/service3
+  tag: latest
+replicaCount: 1
+service:
+  port: 3003
