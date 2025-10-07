@@ -1,0 +1,22 @@
+- hosts: jenkins
+  become: true
+  tasks:
+    - name: Install Docker (Ubuntu)
+      apt:
+        name: docker.io
+        state: latest
+        update_cache: yes
+
+    - name: Ensure jenkins user in docker group
+      user:
+        name: jenkins
+        groups: docker
+        append: yes
+
+- hosts: eks_nodes
+  become: true
+  tasks:
+    - name: Install kubectl prerequisites (example)
+      apt:
+        name: curl
+        state: present
