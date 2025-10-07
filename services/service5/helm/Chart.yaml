@@ -1,0 +1,4 @@
+apiVersion: v2
+name: service5
+description: Helm chart for service5
+version: 0.1.0
